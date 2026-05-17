@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Art — Hark</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cp-black:#000000;--cp-navy:#203958;--cp-charcoal:#3D4140;--cp-plum:#544957;
+    --cp-blue:#599CD0;--cp-stone:#6C6B67;--cp-crimson:#8D322D;--cp-red:#B33E2D;
+    --cp-mist:#C0DCDD;--cp-blush:#E7D4CD;--cp-cream:#E8E0CD;
+    --void:#000000;--deep:#080e14;--panel:#0c1219;--panel2:#111b24;
+    --border:rgba(32,57,88,0.7);--border-hi:rgba(89,156,208,0.5);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--void);color:var(--cp-cream);font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.7;overflow-x:hidden;}
+  #starfield{position:fixed;inset:0;z-index:0;pointer-events:none;}
+  body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.3;}
+  .page{position:relative;z-index:2;}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.2rem 3rem;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(0,0,0,0.96),rgba(0,0,0,0.75));backdrop-filter:blur(10px);}
+  .nav-logo{font-family:'Cinzel',serif;font-size:0.9rem;letter-spacing:0.3em;color:var(--cp-blue);text-transform:uppercase;text-decoration:none;}
+  .nav-links{display:flex;gap:2.5rem;list-style:none;}
+  .nav-links a{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--cp-stone);text-decoration:none;transition:color 0.3s;}
+  .nav-links a:hover{color:var(--cp-mist);}
+  .nav-links a.active{color:var(--cp-blue);border-bottom:1px solid var(--cp-blue);padding-bottom:2px;}
+
+  /* HERO */
+  .art-hero{min-height:60vh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:0 10vw;position:relative;overflow:hidden;}
+  .art-hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 75% 55%,rgba(84,73,87,0.12) 0%,transparent 55%),radial-gradient(ellipse at 25% 40%,rgba(89,156,208,0.05) 0%,transparent 45%),linear-gradient(180deg,var(--void) 0%,var(--deep) 100%);}
+  .pixel-grid{position:absolute;inset:0;z-index:0;opacity:0.025;background-image:linear-gradient(var(--cp-cream) 1px,transparent 1px),linear-gradient(90deg,var(--cp-cream) 1px,transparent 1px);background-size:8px 8px;}
+
+  .art-hero-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-start;}
+  .breadcrumb{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.3em;color:var(--cp-blue);text-transform:uppercase;margin-bottom:2.5rem;display:flex;align-items:center;gap:0.8rem;animation:fadeUp 0.6s 0.1s both;}
+  .breadcrumb a{color:var(--cp-blue);text-decoration:none;opacity:0.6;transition:opacity 0.2s;}
+  .breadcrumb a:hover{opacity:1;}
+  .page-title{font-family:'Cinzel',serif;font-size:clamp(2.8rem,7vw,6.5rem);font-weight:900;color:var(--cp-cream);line-height:0.92;animation:fadeUp 0.6s 0.2s both;}
+  .page-title span{color:var(--cp-blue);}
+  .page-subtitle{font-style:italic;font-size:1.15rem;color:var(--cp-stone);margin-top:2rem;font-weight:300;max-width:480px;animation:fadeUp 0.6s 0.45s both;}
+
+  /* SOCIAL LINKS */
+  .social-row{display:flex;gap:1.8rem;margin-top:2rem;animation:fadeUp 0.6s 0.6s both;}
+  .social-link{
+    display:flex;align-items:center;gap:0.55rem;
+    font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;
+    color:var(--cp-stone);text-decoration:none;transition:color 0.3s;
+  }
+  .social-link:hover{color:var(--cp-mist);}
+  .social-link svg{width:14px;height:14px;fill:currentColor;flex-shrink:0;}
+
+  /* BODY */
+  .art-body{padding:5rem 10vw 8rem;}
+  .col-label{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.35em;color:var(--cp-blue);text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;}
+  .col-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--cp-navy),transparent);}
+
+  /* GALLERY */
+  .gallery-section{margin-bottom:6rem;}
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:3px;
+  }
+
+  /* Each piece */
+  .art-item{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--border);
+    overflow:hidden;
+    transition:border-color 0.3s,transform 0.3s;
+    cursor:pointer;
+  }
+  .art-item::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--cp-blue),transparent);
+    transform:scaleX(0);transform-origin:left;transition:transform 0.35s;z-index:2;
+  }
+  .art-item:hover{border-color:var(--border-hi);transform:translateY(-2px);}
+  .art-item:hover::before{transform:scaleX(1);}
+
+  /* Square canvas */
+  .art-item-canvas{
+    position:relative;width:100%;padding-top:100%;
+    background:#04070a;overflow:hidden;
+  }
+  .art-item-canvas img{
+    position:absolute;inset:8px;
+    width:calc(100% - 16px);height:calc(100% - 16px);
+    object-fit:contain;object-position:center;
+    image-rendering:auto;
+    transition:transform 0.4s;display:block;
+  }
+  .art-item:hover .art-item-canvas img{transform:scale(1.06);}
+
+  /* LIGHTBOX */
+  #lightbox{
+    position:fixed;inset:0;z-index:999;
+    background:rgba(0,0,0,0.92);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity 0.25s;
+    padding:2rem;
+  }
+  #lightbox.open{opacity:1;pointer-events:all;}
+  #lightbox img{
+    max-width:90vw;max-height:90vh;
+    object-fit:contain;display:block;
+    transform:scale(0.94);transition:transform 0.25s;
+    image-rendering:auto;
+  }
+  #lightbox.open img{transform:scale(1);}
+  #lightbox-close{
+    position:absolute;top:1.2rem;right:1.5rem;
+    font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.2em;
+    color:var(--cp-stone);cursor:pointer;transition:color 0.2s;
+    text-transform:uppercase;background:none;border:none;
+  }
+  #lightbox-close:hover{color:var(--cp-cream);}
+  #lightbox-steam{
+    position:absolute;bottom:1.5rem;right:1.5rem;
+    display:flex;align-items:center;gap:0.5rem;
+    font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;
+    color:var(--cp-stone);text-decoration:none;transition:color 0.2s;
+  }
+  #lightbox-steam:hover{color:var(--cp-blue);}
+  #lightbox-steam svg{width:14px;height:14px;fill:currentColor;}
+
+  /* Steam workshop link icon */
+  .art-item-steam{
+    position:absolute;bottom:8px;right:8px;z-index:3;
+    width:26px;height:26px;border-radius:50%;
+    background:rgba(0,0,0,0.72);border:1px solid rgba(32,57,88,0.7);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--cp-stone);text-decoration:none;transition:color 0.2s,border-color 0.2s;
+  }
+  .art-item-steam:hover{color:var(--cp-blue);border-color:var(--cp-blue);}
+  .art-item-steam svg{width:13px;height:13px;fill:currentColor;}
+
+  .art-item-label{
+    padding:0.6rem 0.9rem 0.75rem;
+    border-top:1px solid rgba(32,57,88,0.4);
+  }
+  .art-item-title{
+    font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.1em;
+    color:var(--cp-cream);text-transform:uppercase;
+  }
+  .art-item-sub{
+    font-size:0.8rem;font-style:italic;color:var(--cp-stone);font-weight:300;margin-top:0.1rem;
+  }
+
+  /* Empty state — shown when manifest is empty */
+  .gallery-empty{
+    grid-column:1/-1;
+    padding:5rem 2rem;text-align:center;
+    border:1px dashed rgba(32,57,88,0.4);
+  }
+  .gallery-empty-title{
+    font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.2em;
+    color:var(--cp-navy);text-transform:uppercase;margin-bottom:0.6rem;
+  }
+  .gallery-empty-sub{font-size:0.9rem;font-style:italic;color:var(--cp-stone);opacity:0.6;font-weight:300;}
+
+  /* ORNAMENT / FOOTER */
+  .ornament{text-align:center;padding:1.8rem 0;font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:1.2em;color:var(--cp-navy);text-transform:uppercase;opacity:0.8;}
+  .fade-in{opacity:0;transform:translateY(24px);transition:opacity 0.7s,transform 0.7s;}
+  .fade-in.visible{opacity:1;transform:none;}
+  footer{padding:2.5rem 10vw;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--void);}
+  .footer-text{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.22em;color:var(--cp-navy);text-transform:uppercase;}
+  .footer-motto{font-style:italic;font-size:0.85rem;color:var(--cp-stone);opacity:0.55;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:none;}}
+
+  @media(max-width:768px){
+    nav{padding:1rem 1.5rem;}.nav-links{gap:1.5rem;}
+    .art-hero{padding:0 6vw;}.art-body{padding:3rem 6vw 5rem;}
+    footer{flex-direction:column;gap:1rem;text-align:center;}
+    .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+  }
+  @media(max-width:400px){.gallery-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+<div class="page">
+
+<nav>
+  <a href="index.html" class="nav-logo">Hark</a>
+  <ul class="nav-links">
+    <li><a href="engineering.html">Engineering</a></li>
+    <li><a href="games.html">Games</a></li>
+    <li><a href="art.html" class="active">Art</a></li>
+    <li><a href="books.html">Writing</a></li>
+  </ul>
+</nav>
+
+<div class="art-hero">
+  <div class="art-hero-bg"></div>
+  <div class="pixel-grid"></div>
+  <div class="art-hero-content">
+    <div class="breadcrumb"><a href="index.html">Home</a><span>✦</span><span>Art</span></div>
+    <h1 class="page-title">DIGITAL<br><span>Art</span></h1>
+    <p class="page-subtitle">Illustrations and digital art — whatever I'm working on or just felt like making.</p>
+    <div class="social-row">
+      <a href="https://x.com/StraightUp_Adam" target="_blank" rel="noopener" class="social-link">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        @StraightUp_Adam
+      </a>
+      <a href="https://www.youtube.com/@straightupadam9040" target="_blank" rel="noopener" class="social-link">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        YouTube
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="art-body">
+
+  <div class="gallery-section fade-in">
+    <div class="col-label">Gallery</div>
+    <div class="gallery-grid" id="gallery-grid">
+      <!-- Populated by manifest.json — see art/manifest.json -->
+    </div>
+  </div>
+
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button id="lightbox-close">✕ Close</button>
+  <img id="lightbox-img" src="" alt="">
+  <a id="lightbox-steam" href="#" target="_blank" rel="noopener" style="display:none;">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.029 4.524 4.524s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0z"/></svg>
+    View on Steam Workshop
+  </a>
+</div>
+
+<div class="ornament">✦ · · · ✦ · · · ✦</div>
+<footer>
+  <div class="footer-text">Hark · Adam</div>
+  <div class="footer-motto">Ars longa, vita brevis.</div>
+  <div class="footer-text">Art</div>
+</footer>
+</div>
+
+<script>
+(function(){const c=document.getElementById('starfield'),x=c.getContext('2d');let s=[];function r(){c.width=window.innerWidth;c.height=window.innerHeight;}function mk(n){s=[];for(let i=0;i<n;i++){const b=Math.random()<0.25;s.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.0,a:Math.random()*0.6+0.1,sp:Math.random()*0.012+0.004,ph:Math.random()*Math.PI*2,col:b?'89,156,208':'232,224,205'});}}function d(t){x.clearRect(0,0,c.width,c.height);s.forEach(s=>{const a=s.a*(0.55+0.45*Math.sin(t*0.001*s.sp*60+s.ph));x.beginPath();x.arc(s.x,s.y,s.r,0,Math.PI*2);x.fillStyle=`rgba(${s.col},${a})`;x.fill();});requestAnimationFrame(d);}window.addEventListener('resize',()=>{r();mk(240);});r();mk(240);requestAnimationFrame(d);})();
+
+// ── GALLERY ──────────────────────────────────────────────────
+// Add a piece: { file: "filename.png", title: "Title", sub: "optional subtitle or year" }
+// Drop the image in the art/ folder, then add an entry here.
+// "title" and "sub" are both optional.
+const GALLERY = [
+  { file: "Aug_GB.png",          title: "Augustus",          sub: "2025" },
+  { file: "Bionicle_GB_Test.png",title: "Toa Jaller",        sub: "2025" },
+  { file: "David_GB.png",        title: "King David",        sub: "2025" },
+  { file: "Hawk_Drone.png",      title: "Hawk VS Drone",     sub: "2025",                    wide: true },
+  { file: "Hawk_GB.png" },
+  { file: "WW_Boat.png",         title: "Zelda Windwaker",   sub: "Wallpaper Engine · 2025", link: "https://steamcommunity.com/sharedfiles/filedetails/?id=3611351994", wide: true },
+  { file: "radagonWP.png",       title: "Radagon",           sub: "Wallpaper Engine · 2025", link: "https://steamcommunity.com/sharedfiles/filedetails/?id=3153513699", wide: true },
+];
+// ─────────────────────────────────────────────────────────────
+
+(function(){
+  const grid = document.getElementById('gallery-grid');
+  if (!GALLERY.length) {
+    grid.innerHTML = `
+      <div class="gallery-empty">
+        <div class="gallery-empty-title">Nothing here yet</div>
+        <div class="gallery-empty-sub">Add entries to the GALLERY array in art.html to populate this.</div>
+      </div>`;
+    return;
+  }
+  const lb     = document.getElementById('lightbox');
+  const lbImg  = document.getElementById('lightbox-img');
+  const lbSteam= document.getElementById('lightbox-steam');
+
+  function openLightbox(p) {
+    lbImg.src = 'art/' + p.file;
+    lbImg.alt = p.title || '';
+    if (p.link) { lbSteam.href = p.link; lbSteam.style.display = 'flex'; }
+    else { lbSteam.style.display = 'none'; }
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { lbImg.src = ''; }, 250);
+  }
+
+  document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+  lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  GALLERY.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'art-item';
+    el.innerHTML = `
+      <div class="art-item-canvas">
+        <img src="art/${p.file}" alt="${p.title || ''}">
+      </div>
+      ${(p.title || p.sub) ? `
+      <div class="art-item-label">
+        ${p.title ? `<div class="art-item-title">${p.title}</div>` : ''}
+        ${p.sub   ? `<div class="art-item-sub">${p.sub}</div>` : ''}
+      </div>` : ''}
+    `;
+    el.addEventListener('click', () => openLightbox(p));
+    grid.appendChild(el);
+  });
+})();
+
+(function(){const els=document.querySelectorAll('.fade-in');const io=new IntersectionObserver((e)=>{e.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*100);io.unobserve(e.target);}});},{threshold:0.08});els.forEach(el=>io.observe(el));})();
+</script>
+</body>
+</html>

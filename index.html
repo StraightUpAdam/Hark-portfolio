@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hark — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ── CUBED Pluto Official Palette ── */
+    --cp-black:    #000000;   /* 1 — true black */
+    --cp-navy:     #203958;   /* 2 — dark navy */
+    --cp-charcoal: #3D4140;   /* 3 — dark charcoal */
+    --cp-plum:     #544957;   /* 4 — muted plum */
+    --cp-blue:     #599CD0;   /* 5 — steel blue  ← primary accent */
+    --cp-stone:    #6C6B67;   /* 6 — warm stone */
+    --cp-crimson:  #8D322D;   /* 7 — dark crimson */
+    --cp-red:      #B33E2D;   /* 8 — crimson red */
+    --cp-mist:     #C0DCDD;   /* 9 — pale blue mist */
+    --cp-blush:    #E7D4CD;   /* 10 — warm blush */
+    --cp-cream:    #E8E0CD;   /* 11 — warm cream */
+
+    /* ── Semantic tokens ── */
+    --void:       var(--cp-black);
+    --deep:       #080e14;          /* near-black, navy-tinted */
+    --panel:      #0c1219;
+    --panel2:     #111b24;
+    --accent:     var(--cp-blue);
+    --accent-dim: var(--cp-navy);
+    --accent-hi:  var(--cp-mist);
+    --cream:      var(--cp-cream);
+    --cream-dim:  var(--cp-stone);
+    --border:     rgba(32,57,88,0.7);   /* navy at 70% */
+    --border-hi:  rgba(89,156,208,0.5); /* blue at 50% */
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--void);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.3;
+  }
+
+  .page { position: relative; z-index: 2; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem 3rem;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.75) 100%);
+    backdrop-filter: blur(10px);
+  }
+  .nav-logo {
+    font-family: 'Cinzel', serif; font-size: 0.9rem;
+    letter-spacing: 0.3em; color: var(--cp-blue);
+    text-transform: uppercase; text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-family: 'Cinzel', serif; font-size: 0.68rem;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--cream-dim); text-decoration: none; transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--cp-mist); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    padding: 0 10vw; position: relative;
+  }
+
+  .hero-label {
+    font-family: 'Cinzel', serif; font-size: 0.62rem;
+    letter-spacing: 0.45em; color: var(--cp-blue);
+    text-transform: uppercase; margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 1rem;
+    animation: fadeUp 0.8s 0.2s both;
+  }
+  .hero-label::before {
+    content: ''; display: inline-block;
+    width: 40px; height: 1px; background: var(--cp-blue);
+  }
+
+  .hero-name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(3.5rem, 10vw, 9rem);
+    font-weight: 900; line-height: 0.92;
+    color: var(--cp-cream); letter-spacing: -0.01em;
+    animation: fadeUp 0.8s 0.35s both;
+  }
+  .hero-name span { color: var(--cp-blue); display: block; }
+
+  .hero-tagline {
+    font-style: italic;
+    font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+    color: var(--cp-stone); max-width: 520px;
+    margin-top: 1.8rem; margin-bottom: 3.5rem;
+    font-weight: 300; animation: fadeUp 0.8s 0.5s both;
+  }
+
+  /* ── NAV CARDS — no emojis, purely typographic ── */
+  .nav-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px; /* hairline gap — cards butt up like panels */
+    animation: fadeUp 0.8s 0.65s both;
+    border: 1px solid var(--border);
+  }
+
+  .nav-card {
+    display: flex; flex-direction: column;
+    padding: 1.8rem 1.8rem 1.6rem;
+    background: rgba(32,57,88,0.08);
+    text-decoration: none;
+    position: relative; overflow: hidden;
+    transition: background 0.35s;
+    border-right: 1px solid var(--border);
+  }
+  .nav-card:last-child { border-right: none; }
+
+  /* top accent line that fills on hover */
+  .nav-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 2px; background: var(--cp-blue);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.35s;
+  }
+  .nav-card:hover { background: rgba(89,156,208,0.09); }
+  .nav-card:hover::before { transform: scaleX(1); }
+
+  /* Roman numeral */
+  .nav-card-num {
+    font-family: 'Cinzel', serif; font-size: 0.55rem;
+    letter-spacing: 0.35em; color: var(--cp-blue);
+    text-transform: uppercase; opacity: 0.55;
+    margin-bottom: 1.2rem;
+    transition: opacity 0.3s;
+  }
+  .nav-card:hover .nav-card-num { opacity: 1; }
+
+  .nav-card-label {
+    font-family: 'Cinzel', serif; font-size: 0.82rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--cp-cream); margin-bottom: 0.4rem;
+    transition: color 0.3s;
+  }
+  .nav-card:hover .nav-card-label { color: var(--cp-mist); }
+
+  .nav-card-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.85rem; font-style: italic;
+    color: var(--cp-stone); font-weight: 300;
+    transition: color 0.3s;
+  }
+  .nav-card:hover .nav-card-sub { color: var(--cp-blush); }
+
+  /* large ghost numeral in corner */
+  .nav-card-ghost {
+    position: absolute; bottom: -0.5rem; right: 0.8rem;
+    font-family: 'Cinzel', serif; font-size: 4rem; font-weight: 900;
+    color: rgba(89,156,208,0.05); line-height: 1;
+    pointer-events: none; transition: color 0.35s;
+    user-select: none;
+  }
+  .nav-card:hover .nav-card-ghost { color: rgba(89,156,208,0.12); }
+
+  /* ── DECORATIVE COLUMNS ── */
+  .hero-decor {
+    position: absolute; right: 6vw; top: 50%;
+    transform: translateY(-50%);
+    display: flex; gap: 10px;
+    opacity: 0; animation: fadeIn 1.5s 1s both;
+  }
+  .hero-decor-col {
+    width: 1px;
+    background: linear-gradient(180deg, transparent 0%, var(--cp-navy) 25%, var(--cp-blue) 50%, var(--cp-navy) 75%, transparent 100%);
+  }
+
+  /* ── ABOUT SECTION ── */
+  #about {
+    padding: 8rem 10vw;
+    background: linear-gradient(180deg, var(--void) 0%, var(--deep) 100%);
+    border-top: 1px solid var(--border);
+  }
+
+  .section-header {
+    display: flex; align-items: center;
+    gap: 1.5rem; margin-bottom: 4rem;
+  }
+  .section-num {
+    font-family: 'Cinzel', serif; font-size: 0.62rem;
+    letter-spacing: 0.3em; color: var(--cp-blue);
+  }
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 600; color: var(--cp-cream); letter-spacing: 0.05em;
+  }
+  .section-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--cp-navy), transparent);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 6rem; align-items: start;
+  }
+
+  .body-text p {
+    font-size: 1.05rem; color: var(--cp-stone);
+    font-weight: 300; line-height: 1.85; margin-bottom: 1.3rem;
+  }
+  .body-text strong { color: var(--cp-cream); font-weight: 400; }
+  .body-text em { color: var(--cp-mist); font-style: italic; }
+
+  .facets { display: flex; flex-direction: column; gap: 0; }
+  .facet {
+    padding: 1.3rem 1.5rem;
+    border-left: 2px solid var(--cp-navy);
+    border-bottom: 1px solid rgba(32,57,88,0.4);
+    background: rgba(32,57,88,0.05);
+    transition: all 0.3s;
+  }
+  .facet:last-child { border-bottom: none; }
+  .facet:hover {
+    background: rgba(89,156,208,0.07);
+    border-left-color: var(--cp-blue);
+  }
+  .facet-title {
+    font-family: 'Cinzel', serif; font-size: 0.72rem;
+    letter-spacing: 0.15em; color: var(--cp-blue);
+    text-transform: uppercase; margin-bottom: 0.35rem;
+  }
+  .facet-desc {
+    font-size: 0.9rem; color: var(--cp-stone);
+    font-weight: 300; line-height: 1.55;
+  }
+
+  /* ── ORNAMENT ── */
+  .ornament {
+    text-align: center; padding: 1.8rem 0;
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem; letter-spacing: 1.2em;
+    color: var(--cp-navy); text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 2.5rem 10vw;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--void);
+  }
+  .footer-text {
+    font-family: 'Cinzel', serif; font-size: 0.6rem;
+    letter-spacing: 0.22em; color: var(--cp-navy); text-transform: uppercase;
+  }
+  .footer-motto {
+    font-style: italic; font-size: 0.85rem;
+    color: var(--cp-stone); opacity: 0.55;
+  }
+
+  /* ── ANIMATIONS ── */
+  .fade-in {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+  .fade-in.visible { opacity: 1; transform: none; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .nav-cards { grid-template-columns: repeat(2, 1fr); }
+    .hero-decor { display: none; }
+    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+  }
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { gap: 1.5rem; }
+    #about { padding: 5rem 6vw; }
+    .nav-cards { grid-template-columns: 1fr 1fr; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+<div class="page">
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Hark</a>
+  <ul class="nav-links">
+    <li><a href="engineering.html">Engineering</a></li>
+    <li><a href="games.html">Games</a></li>
+    <li><a href="art.html">Art</a></li>
+    <li><a href="books.html">Writing</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-label">Civil Engineer — Transportation</div>
+
+  <h1 class="hero-name">
+    Adam<br>
+    <span>Hark</span>
+  </h1>
+
+  <p class="hero-tagline">
+    Civil engineer working in transportation infrastructure.
+    This site also includes personal work — games, digital art, and long-form fiction.
+  </p>
+
+  <div class="nav-cards">
+    <a href="engineering.html" class="nav-card">
+      <div class="nav-card-num">I</div>
+      <div class="nav-card-label">Engineering</div>
+      <div class="nav-card-sub">Transportation</div>
+      <div class="nav-card-ghost">I</div>
+    </a>
+    <a href="games.html" class="nav-card">
+      <div class="nav-card-num">II</div>
+      <div class="nav-card-label">Games</div>
+      <div class="nav-card-sub">CUBED Pluto</div>
+      <div class="nav-card-ghost">II</div>
+    </a>
+    <a href="art.html" class="nav-card">
+      <div class="nav-card-num">III</div>
+      <div class="nav-card-label">Art</div>
+      <div class="nav-card-sub">Visual work</div>
+      <div class="nav-card-ghost">III</div>
+    </a>
+    <a href="books.html" class="nav-card">
+      <div class="nav-card-num">IV</div>
+      <div class="nav-card-label">Writing</div>
+      <div class="nav-card-sub">Stories & fiction</div>
+      <div class="nav-card-ghost">IV</div>
+    </a>
+  </div>
+
+  <div class="hero-decor">
+    <div class="hero-decor-col" style="height:44vh"></div>
+    <div class="hero-decor-col" style="height:60vh;margin-top:-9vh"></div>
+    <div class="hero-decor-col" style="height:34vh;margin-top:6vh"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header fade-in">
+    <span class="section-num">I</span>
+    <h2 class="section-title">About</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="about-grid">
+    <div class="body-text fade-in">
+      <p>
+        I'm a <strong>civil engineer</strong> working in transportation — roads, bridges, and
+        infrastructure systems that people use every day without thinking about them.
+        That invisibility is the point. Good engineering disappears into the world.
+      </p>
+      <p>
+        Outside of work, I build indie games, make digital art, and write fantasy fiction.
+        <em>Different disciplines, the same underlying drive</em> — making things that
+        didn't exist before.
+      </p>
+      <p>
+        This site collects both sides. The professional and the personal are here
+        because they belong to the same person.
+      </p>
+    </div>
+
+    <div class="facets fade-in">
+      <div class="facet">
+        <div class="facet-title">Civil Engineering</div>
+        <div class="facet-desc">Transportation infrastructure — designing systems that move people and goods reliably and safely.</div>
+      </div>
+      <div class="facet">
+        <div class="facet-title">Game Development</div>
+        <div class="facet-desc">Indie games under the CUBED Pluto banner. Currently building in Unity.</div>
+      </div>
+      <div class="facet">
+        <div class="facet-title">Digital Art</div>
+        <div class="facet-desc">Digital illustrations and visual work exploring form, texture, and color.</div>
+      </div>
+      <div class="facet">
+        <div class="facet-title">Writing</div>
+        <div class="facet-desc">Long-form fantasy fiction. Multiple stories in progress — some may even get finished.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ornament">✦ · · · ✦ · · · ✦</div>
+
+<footer>
+  <div class="footer-text">Hark · Adam</div>
+  <div class="footer-motto">Ars longa, vita brevis.</div>
+  <div class="footer-text">Engineer · Artist · Maker</div>
+</footer>
+
+</div><!-- .page -->
+
+<script>
+/* STARFIELD — tinted to navy/blue palette */
+(function () {
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function createStars(n) {
+    stars = [];
+    // Mix of cream-white stars and faint blue stars for the CP palette
+    for (let i = 0; i < n; i++) {
+      const isBlue = Math.random() < 0.25;
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.0,
+        alpha: Math.random() * 0.6 + 0.1,
+        speed: Math.random() * 0.012 + 0.004,
+        phase: Math.random() * Math.PI * 2,
+        // cream-white or steel-blue
+        color: isBlue ? '89,156,208' : '232,224,205',
+      });
+    }
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      const a = s.alpha * (0.55 + 0.45 * Math.sin(t * 0.001 * s.speed * 60 + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${s.color},${a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); createStars(240); });
+  resize();
+  createStars(240);
+  requestAnimationFrame(draw);
+})();
+
+/* SCROLL FADE */
+(function () {
+  const els = document.querySelectorAll('.fade-in');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 100);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  els.forEach(el => io.observe(el));
+})();
+</script>
+</body>
+</html>

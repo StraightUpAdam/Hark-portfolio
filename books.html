@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Writing — Hark</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cp-black:#000000;--cp-navy:#203958;--cp-charcoal:#3D4140;--cp-plum:#544957;
+    --cp-blue:#599CD0;--cp-stone:#6C6B67;--cp-crimson:#8D322D;--cp-red:#B33E2D;
+    --cp-mist:#C0DCDD;--cp-blush:#E7D4CD;--cp-cream:#E8E0CD;
+    --void:#000000;--deep:#080e14;--panel:#0c1219;--panel2:#111b24;
+    --border:rgba(32,57,88,0.7);--border-hi:rgba(141,50,45,0.5);
+    --accent:var(--cp-crimson);--accent-hi:var(--cp-red);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--void);color:var(--cp-cream);font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.7;overflow-x:hidden;}
+  #starfield{position:fixed;inset:0;z-index:0;pointer-events:none;}
+  body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.3;}
+  .page{position:relative;z-index:2;}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.2rem 3rem;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(0,0,0,0.96),rgba(0,0,0,0.75));backdrop-filter:blur(10px);}
+  .nav-logo{font-family:'Cinzel',serif;font-size:0.9rem;letter-spacing:0.3em;color:var(--cp-blue);text-transform:uppercase;text-decoration:none;}
+  .nav-links{display:flex;gap:2.5rem;list-style:none;}
+  .nav-links a{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--cp-stone);text-decoration:none;transition:color 0.3s;}
+  .nav-links a:hover{color:var(--cp-mist);}
+  .nav-links a.active{color:var(--cp-red);border-bottom:1px solid var(--cp-red);padding-bottom:2px;}
+
+  /* HERO */
+  .writing-hero{
+    min-height:100vh;
+    display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+    padding:0 10vw;position:relative;overflow:hidden;
+  }
+  .writing-hero-bg{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse at 70% 40%,rgba(141,50,45,0.08) 0%,transparent 55%),
+      radial-gradient(ellipse at 20% 70%,rgba(84,73,87,0.07) 0%,transparent 50%),
+      linear-gradient(180deg,var(--void) 0%,#06080a 100%);
+  }
+  /* Subtle horizontal rule lines — like manuscript paper */
+  .manuscript-lines{
+    position:absolute;inset:0;z-index:0;opacity:0.018;
+    background-image:linear-gradient(var(--cp-cream) 1px,transparent 1px);
+    background-size:100% 48px;
+  }
+
+  .writing-hero-content{position:relative;z-index:2;max-width:780px;}
+  .breadcrumb{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.3em;color:var(--cp-red);text-transform:uppercase;margin-bottom:2.5rem;display:flex;align-items:center;gap:0.8rem;animation:fadeUp 0.6s 0.1s both;}
+  .breadcrumb a{color:var(--cp-red);text-decoration:none;opacity:0.6;transition:opacity 0.2s;}
+  .breadcrumb a:hover{opacity:1;}
+
+  .work-status{
+    font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.3em;
+    color:var(--cp-crimson);border:1px solid rgba(141,50,45,0.4);
+    padding:0.22em 0.7em;display:inline-block;margin-bottom:2rem;
+    background:rgba(141,50,45,0.06);animation:fadeUp 0.6s 0.2s both;
+  }
+
+  .book-title{
+    font-family:'Cinzel',serif;
+    font-size:clamp(2.4rem,6.5vw,6rem);
+    font-weight:900;color:var(--cp-cream);
+    line-height:1.0;letter-spacing:0.02em;
+    animation:fadeUp 0.6s 0.3s both;
+  }
+  .book-title span{color:var(--cp-red);}
+
+  .book-tagline{
+    font-style:italic;font-size:clamp(1rem,1.8vw,1.3rem);
+    color:var(--cp-stone);margin-top:2rem;font-weight:300;
+    line-height:1.7;animation:fadeUp 0.6s 0.5s both;
+  }
+
+  /* Ornamental divider */
+  .hero-rule{
+    display:flex;align-items:center;gap:1.2rem;
+    margin-top:3.5rem;animation:fadeUp 0.6s 0.65s both;
+  }
+  .hero-rule-line{flex:1;max-width:120px;height:1px;background:linear-gradient(90deg,transparent,rgba(141,50,45,0.5));}
+  .hero-rule-mark{font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.5em;color:var(--cp-crimson);text-transform:uppercase;}
+  .hero-rule-line.right{background:linear-gradient(270deg,transparent,rgba(141,50,45,0.5));}
+
+  /* BODY */
+  .writing-body{padding:6rem 10vw 8rem;}
+  .col-label{
+    font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.35em;
+    color:var(--cp-red);text-transform:uppercase;margin-bottom:1.5rem;
+    display:flex;align-items:center;gap:1rem;
+  }
+  .col-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(141,50,45,0.4),transparent);}
+
+  /* ABOUT SECTION */
+  .about-section{margin-bottom:6rem;max-width:680px;}
+  .about-section p{
+    font-size:1.1rem;color:var(--cp-stone);font-weight:300;
+    line-height:1.95;margin-bottom:1.4rem;
+  }
+  .about-section p strong{color:var(--cp-cream);font-weight:400;}
+  .about-section p em{color:var(--cp-blush);font-style:italic;}
+
+  /* EPIGRAPH */
+  .epigraph-section{
+    margin-bottom:6rem;
+    padding:2.5rem 3rem;
+    border-left:2px solid rgba(141,50,45,0.4);
+    position:relative;
+  }
+  .epigraph-section::before{
+    content:'';position:absolute;top:0;left:-1px;width:1px;height:40%;
+    background:linear-gradient(180deg,var(--cp-crimson),transparent);
+  }
+  .epigraph-text{
+    font-size:1.2rem;font-style:italic;color:var(--cp-blush);
+    font-weight:300;line-height:1.85;margin-bottom:1rem;
+  }
+  .epigraph-attr{
+    font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.2em;
+    color:var(--cp-stone);text-transform:uppercase;
+  }
+
+  /* DETAILS GRID */
+  .details-section{margin-bottom:6rem;}
+  .details-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0;}
+  .detail-item{
+    padding:1.2rem 1.5rem;
+    border:1px solid rgba(32,57,88,0.35);
+    border-right:none;border-bottom:none;
+    transition:background 0.3s;
+  }
+  .detail-item:nth-child(n){border-right:none;}
+  .details-grid .detail-item:last-child,
+  .details-grid .detail-item:nth-last-child(-n+3){border-bottom:1px solid rgba(32,57,88,0.35);}
+  .details-grid{border-right:1px solid rgba(32,57,88,0.35);border-bottom:1px solid rgba(32,57,88,0.35);}
+  .detail-item:hover{background:rgba(141,50,45,0.04);}
+  .detail-key{
+    font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.22em;
+    color:var(--cp-red);text-transform:uppercase;margin-bottom:0.3rem;
+  }
+  .detail-val{font-size:0.95rem;color:var(--cp-stone);font-weight:300;}
+
+  /* ORNAMENT / FOOTER */
+  .ornament{text-align:center;padding:1.8rem 0;font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:1.2em;color:rgba(141,50,45,0.4);text-transform:uppercase;}
+  .fade-in{opacity:0;transform:translateY(24px);transition:opacity 0.7s,transform 0.7s;}
+  .fade-in.visible{opacity:1;transform:none;}
+  footer{padding:2.5rem 10vw;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--void);}
+  .footer-text{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.22em;color:var(--cp-navy);text-transform:uppercase;}
+  .footer-motto{font-style:italic;font-size:0.85rem;color:var(--cp-stone);opacity:0.55;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:none;}}
+
+  @media(max-width:768px){
+    nav{padding:1rem 1.5rem;}.nav-links{gap:1.5rem;}
+    .writing-hero{padding:0 6vw;min-height:85vh;}
+    .writing-body{padding:4rem 6vw 5rem;}
+    .epigraph-section{padding:2rem 1.8rem;}
+    footer{flex-direction:column;gap:1rem;text-align:center;}
+  }
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+<div class="page">
+
+<nav>
+  <a href="index.html" class="nav-logo">Hark</a>
+  <ul class="nav-links">
+    <li><a href="engineering.html">Engineering</a></li>
+    <li><a href="games.html">Games</a></li>
+    <li><a href="art.html">Art</a></li>
+    <li><a href="books.html" class="active">Writing</a></li>
+  </ul>
+</nav>
+
+<div class="writing-hero">
+  <div class="writing-hero-bg"></div>
+  <div class="manuscript-lines"></div>
+  <div class="writing-hero-content">
+    <div class="breadcrumb"><a href="index.html">Home</a><span>✦</span><span>Writing</span></div>
+    <div class="work-status">In Progress · First Draft</div>
+    <h1 class="book-title">Trident of<br>a <span>Serpent</span></h1>
+    <p class="book-tagline">
+      An epic following Titus Victus Hamiota through the fires of war —<br>
+      where history and myth have always shared the same battlefield.
+    </p>
+    <div class="hero-rule">
+      <div class="hero-rule-line"></div>
+      <div class="hero-rule-mark">✦</div>
+      <div class="hero-rule-line right"></div>
+    </div>
+  </div>
+</div>
+
+<div class="writing-body">
+
+  <div class="about-section fade-in">
+    <div class="col-label">About the Work</div>
+    <p>
+      <strong>Abbora</strong> and <strong>Abbir</strong> — twin cities born of the same blood,
+      founded by brothers who chose rivalry over ruin. For generations the wound held.
+      Now it has broken open, and the war between them threatens to swallow the known world.
+    </p>
+    <p>
+      At the center of it is <strong>Titus Victus Hamiota</strong> — Victor, to the men who follow him.
+      <strong>Trident of a Serpent</strong> traces his path through the conflict,
+      but the world he moves through is not quite the one any historian would recognize.
+    </p>
+    <p>
+      The myths were always real. The gods were always watching.
+      <em>Whether they were on anyone's side is a different question.</em>
+    </p>
+  </div>
+
+  <div class="epigraph-section fade-in">
+    <div class="epigraph-text">
+      "I am never less at leisure than when at leisure,<br>
+      or less alone than when alone."
+    </div>
+    <div class="epigraph-attr">— Titus Victus Hamiota</div>
+  </div>
+
+  <div class="details-section fade-in">
+    <div class="col-label">The Project</div>
+    <div class="details-grid">
+      <div class="detail-item">
+        <div class="detail-key">Genre</div>
+        <div class="detail-val">Historical Fantasy</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-key">Setting</div>
+        <div class="detail-val">The War of Abbora & Abbir</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-key">Form</div>
+        <div class="detail-val">Novel · Epic</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-key">Status</div>
+        <div class="detail-val">First Draft · In Progress</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="ornament">✦ · · · ✦ · · · ✦</div>
+<footer>
+  <div class="footer-text">Hark · Adam</div>
+  <div class="footer-motto">Ars longa, vita brevis.</div>
+  <div class="footer-text">Writing</div>
+</footer>
+</div>
+
+<script>
+(function(){const c=document.getElementById('starfield'),x=c.getContext('2d');let s=[];function r(){c.width=window.innerWidth;c.height=window.innerHeight;}function mk(n){s=[];for(let i=0;i<n;i++){const b=Math.random()<0.15;s.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*0.9,a:Math.random()*0.5+0.1,sp:Math.random()*0.012+0.004,ph:Math.random()*Math.PI*2,col:b?'179,62,45':'232,224,205'});}}function d(t){x.clearRect(0,0,c.width,c.height);s.forEach(s=>{const a=s.a*(0.55+0.45*Math.sin(t*0.001*s.sp*60+s.ph));x.beginPath();x.arc(s.x,s.y,s.r,0,Math.PI*2);x.fillStyle=`rgba(${s.col},${a})`;x.fill();});requestAnimationFrame(d);}window.addEventListener('resize',()=>{r();mk(200);});r();mk(200);requestAnimationFrame(d);})();
+(function(){const els=document.querySelectorAll('.fade-in');const io=new IntersectionObserver((e)=>{e.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*100);io.unobserve(e.target);}});},{threshold:0.08});els.forEach(el=>io.observe(el));})();
+</script>
+</body>
+</html>
